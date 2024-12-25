@@ -22,13 +22,13 @@ collision3 = False
 point_x = random.randint(10, 80)
 point_y = 150
 
-y_position = 105
+position_of_y = 105
 
 # tree
 circle1_y = 105
 circle2_y = 105
 circle_x = random.randint(10, 80)
-circle_speed = 0.5
+circles_speed = 0.5
 trunk = 96
 
 seq = random.randint(1, 5)
@@ -38,14 +38,14 @@ dis2 = False  # diamond dissappear
 dis3 = False
 dis4 = False
 
-speed = 0.38
-diamond_speed = 0.45
-obstacles_speed = 0.5
+cars_speed = 0.38
+speed_of_diamond = 0.45
+speed_of_obstacle = 0.5
 
-car_position = 51
-car_movement_direction = 0
+position_of_car = 51
+dir_of_car_movement = 0
 
-game_paused = False
+game_is_paused = False
 game_reset = False
 stop = True
 
@@ -53,7 +53,7 @@ p_speed = 0
 
 p_cir_speed = 0
 
-lives = 3
+total_lives = 3
 
 var = 1
 
@@ -89,21 +89,21 @@ class AABB:
 
 
 # obstacle collision condition
-def collides_with_sq_obstacle(car_pos, car_width, car_height, obstacles):
+def square_obstacle_collision(car_pos, car_width, car_height, obstacles):
     return (car_pos - 5 < obstacles.x + obstacles.w and #if the left edge ofthe car is to the left of the right of the obs
             car_pos + car_width > obstacles.x and #if the right edge of the car is to the left of the obs
             20 < obstacles.y + obstacles.h and
             20 + car_height > obstacles.y)
 
 
-def collides_with_car(car_pos, car_width, car_height, point):
+def collision_with_car(car_pos, car_width, car_height, point):
     car_aabb = AABB(car_pos - car_width / 2, 20 - car_height / 2, car_width, car_height)
     point_aabb = AABB(point['x'], point['y'], 1, 1)
 
     return car_aabb.collides_with(point_aabb)
 
 
-def collides_with_point(car_pos, car_width, car_height, pts):
+def point_collision(car_pos, car_width, car_height, pts):
     return (car_pos - 5 == pts.x + pts.w and
             car_pos + car_width > pts.x and
             20 < pts.y + pts.h and
@@ -156,7 +156,7 @@ def draw_circle(cx, cy, radius):
     x = 0
     y = radius
 
-    circle_pts2(x, y, cx, cy)
+    circle_points2(x, y, cx, cy)
 
     while x < y:
         if d < 0:
@@ -165,14 +165,14 @@ def draw_circle(cx, cy, radius):
             d = d + 2 * x - 2 * y + 5
             y -= 1
         x += 1
-        circle_pts2(x, y, cx, cy)
+        circle_points2(x, y, cx, cy)
 
 
 def mid_circle(cx, cy, radius):
     d = 1 - radius
     x = 0
     y = radius
-    circle_pts(x, y, cx, cy)
+    circle_points(x, y, cx, cy)
 
     while x < y:
         if d < 0:
@@ -181,10 +181,10 @@ def mid_circle(cx, cy, radius):
             d = d + 2 * x - 2 * y + 5
             y -= 1
         x += 1
-        circle_pts(x, y, cx, cy)
+        circle_points(x, y, cx, cy)
 
 
-def circle_pts(x, y, cx, cy):
+def circle_points(x, y, cx, cy):
     glPointSize(50)
     glBegin(GL_POINTS)
     glVertex2f(x + cx, y + cy)
@@ -207,7 +207,7 @@ def draw_point(x, y):
     glDisable(GL_POINT_SMOOTH)
 
 
-def circle_pts2(x, y, cx, cy):
+def circle_points2(x, y, cx, cy):
     num_segments = 100 # Increase this value for a smoother circle
     glBegin(GL_POINTS)
     for i in range(num_segments):
@@ -216,20 +216,20 @@ def circle_pts2(x, y, cx, cy):
     glEnd()
 
 
-def draw_car(car_position, car_width, car_height):
-    car_y = 20  # Fixed y-position for the car in the middle
+def drawing_the_car(car_position, car_width, car_height):
+    y_car = 20  # Fixed y-position for the car in the middle
     # Draw wheels
-    wheel_radius = car_height / 4  # Adjust the wheel size as needed
-    wheel_y = car_y - car_height / 2 - wheel_radius  # Place wheels at the bottom of the car
-    wheel_positions = [-car_width / 2, -car_width / 3, car_width / 3, car_width / 2]
+    radius_of_wheel = car_height / 4  # Adjust the wheel size as needed
+    wheel_y = y_car - car_height / 2 - radius_of_wheel  # Place wheels at the bottom of the car
+    position_of_wheel = [-car_width / 2, -car_width / 3, car_width / 3, car_width / 2]
 
 
     glColor3f(0.0, 0.0, 0.0)  # Black color for the wheels
 
     glBegin(GL_POINTS)
 
-    for wheel_position in wheel_positions:
-        draw_wheel(car_position + wheel_position, wheel_y, wheel_radius)
+    for wheel_position in position_of_wheel:
+        draw_wheel(car_position + wheel_position, wheel_y, radius_of_wheel)
 
     glEnd()
 
@@ -240,7 +240,7 @@ def draw_car(car_position, car_width, car_height):
     glEnd()
     # Draw car body
     for x in range(int(car_position - car_width / 2), int(car_position + car_width / 2)):
-        for y in range(int(car_y - car_height / 2), int(car_y + car_height / 2)):
+        for y in range(int(y_car - car_height / 2), int(y_car + car_height / 2)):
             glPointSize(9)
             glBegin(GL_POINTS)
             glVertex2f(x, y)
@@ -256,7 +256,7 @@ def draw_wheel(cx, cy, radius):
         glVertex2f(x - 0.95, y + 3)
 
 
-def draw_obstacles(obstacles):
+def obstacles_drawing(obstacles):
     glColor3f(1.0, 0.0, 0.0)
     glPointSize(10)
     glBegin(GL_POINTS)
@@ -290,15 +290,17 @@ def draw_solid_diamond(diamond):
 
 
 # text function
-def render_text(x, y, text, r, g, b):
-    glColor3f(r, g, b)  # Set text color to white
-    glRasterPos2f(x, y)
-    for character in text:
-        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, ord(character))
+def text_rendering(x, y, text, r, g, b):
+    glColor3f(r, g, b)  # Set text color
+    glRasterPos2f(x, y)  # Position the text
+    for char in text:
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, ord(char))
+
 
 
 def display():
-    global y_position, score, speed, circle1_y, circle2_y, point_speed, circle_speed, diamond, circle_x, seq, car_position, game_paused, obstacles_speed, collision, var, dis, lives, point_y, point_x, trunk, points
+    global score, game_is_paused
+    global position_of_y, score, cars_speed, circle1_y, circle2_y, point_speed, circles_speed, diamond, circle_x, seq, position_of_car, game_is_paused, speed_of_obstacle, collision, var, dis, total_lives, point_y, point_x, trunk, points
     glClear(GL_COLOR_BUFFER_BIT)
 
     # Draw road
@@ -346,13 +348,13 @@ def display():
     glColor3f(1.0, 1.0, 1.0)
     glPointSize(7.5)
     # draw_line(y_position, 50, y_position + 11, 50)
-    draw_line(50, y_position, 50, y_position + 30)
+    draw_line(50, position_of_y, 50, position_of_y + 30)
 
     # draw obstacles
-    draw_obstacles(obstacles)
+    obstacles_drawing(obstacles)
 
-    draw_obstacles(obstacles2)
-    draw_obstacles(obstacles3)
+    obstacles_drawing(obstacles2)
+    obstacles_drawing(obstacles3)
 
     # Draw moving points
     glColor3f(1.0, 0.843, 0.0)  # golden color
@@ -361,222 +363,253 @@ def display():
         draw_point(point['x'], point['y'])
 
         # Check for collision with car
-        if collides_with_car(car_position, 5, 10, point):
+        if collision_with_car(position_of_car, 5, 10, point):
             print("Point collected!")
-            speed += 0.025  #car_speed
-            circle_speed += 0.005
+            cars_speed += 0.025  #car_speed
+            circles_speed += 0.005
             point_speed += 0.005
             score += 1
             point['y'] = 105
             point['x'] = random.uniform(23, 80)
 
     # draw diamond
-    if game_paused == False and lives != 0:
+    if game_is_paused == False and total_lives != 0:
         draw_solid_diamond(diamond)
 
         # Draw car
     glPointSize(12)
-    draw_car(car_position, 5, 10)
+    drawing_the_car(position_of_car, 5, 10)
 
     # Draw "Lives" information text
     glColor3f(1.0, 1.0, 1.0)
-    render_text(5, 10, f"Lives: {lives}", 0.0, 0.0, 0.0)
-    render_text(5, 90, f"Score: {score}", 0.0, 0.0, 0.0)
+    text_rendering(5, 10, f"Lives: {total_lives}", 0.0, 0.0, 0.0)
+    text_rendering(5, 90, f"Score: {score}", 0.0, 0.0, 0.0)
 
     # Check if the game is over and display "Game Over" continuously
-    if lives == 0:
+    if total_lives == 0:
         glColor3f(1.0, 0.0, 0.0)  # Set text color to white
-        render_text(43, 50, "Game Over", 0.0, 1.0, 1.0)
+        text_rendering(43, 50, "Game Over", 0.0, 1.0, 1.0)
         glColor3f(1.0, 1.0, 1.0)
-        render_text(43, 45, f"Your Final Score: {score}!", 1.0, 1.0, 1.0)
+        text_rendering(43, 45, f"Your Final Score: {score}!", 1.0, 1.0, 1.0)
+    # Draw Buttons
+    draw_restart_icon()  # Restart icon at top-left
+    draw_pause_icon(game_is_paused)  # Pause/Resume icon at top-center
+    draw_exit_icon()  # Exit icon at top-right
+
+   
     glutSwapBuffers()
+def draw_restart_icon():
+    glColor3f(0.0, 1.0, 1.0)  # Cyan for Restart icon
+    # Smaller arrow for Restart
+    draw_line(5, 95, 12, 95)  # Horizontal line (arrow base)
+    draw_line(5, 95, 9, 97)   # Upward diagonal (left side)
+    draw_line(5, 95, 9, 93)   # Downward diagonal (right side)
+
+def draw_pause_icon(paused):
+    glColor3f(0.7, 0.7, 0.0)  # Yellow for Pause/Resume
+    if paused:
+        # Smaller triangle for Resume
+        draw_line(48, 97, 52, 99)  # Left edge
+        draw_line(48, 97, 48, 95)  # Right edge
+        draw_line(52, 99, 48, 95)  # Bottom edge
+    else:
+        # Smaller pause bars
+        draw_line(47, 99, 47, 95)  # Left bar
+        draw_line(50, 99, 50, 95)  # Right bar
+
+def draw_exit_icon():
+    glColor3f(1.0, 0.2, 0.2)  # Red for Exit icon
+    # Smaller "X" for Exit
+    draw_line(88, 99, 92, 95)  # Diagonal line (\)
+    draw_line(88, 95, 92, 99)  # Diagonal line (/)
+
+
+
+    
 
 
 def animation():
-    global y_position, stop, speed, point_speed, diamond_speed, circle1_y, circle2_y, circle_speed, circle_x, seq, car_position, dis3, dis4, game_paused, obstacles_speed, dis2, collision, collision2, collision3, var, dis, lives, point_y, point_x, trunk
-    if stop:
-        if game_paused == False:  # Check if the game is not paused
-            circle1_y -= circle_speed
-            circle2_y -= circle_speed
-            trunk -= circle_speed
+    global position_of_y, stop, cars_speed, point_speed, speed_of_diamond, circle1_y, circle2_y, circles_speed
+    global circle_x, seq, position_of_car, dis3, dis4, game_is_paused, speed_of_obstacle, dis2, collision
+    global collision2, collision3, var, dis, total_lives, point_y, point_x, trunk
 
-            # Reset circles to the top if they reach the bottom
-            if trunk < -100:
-                trunk = 105
+    # Check if the game is running (not paused)
+    if stop and not game_is_paused:
+        # Circles animation
+        circle1_y -= circles_speed
+        circle2_y -= circles_speed
+        trunk -= circles_speed
 
-            if circle1_y < -100:
-                circle1_y = 105
-                seq = random.randint(1, 5)
-            if circle2_y < -300:
-                circle2_y = 105
-                circle_x = random.randint(30, 70)
+        # Reset circles to the top if they reach the bottom
+        if trunk < -100:
+            trunk = 105
+        if circle1_y < -100:
+            circle1_y = 105
+            seq = random.randint(1, 5)
+        if circle2_y < -300:
+            circle2_y = 105
+            circle_x = random.randint(30, 70)
 
         # Update the y-coordinate for each moving point
-        if game_paused == False and lives != 0:
-            for point in points:
-                point['y'] -= point['speed']
-                if point['y'] < -13:
-                    point['y'] = 105
-                    point['x'] = random.uniform(23, 80)
-                    # point_y = random.uniform(20, 80)
+        for point in points:
+            point['y'] -= point['speed']
+            if point['y'] < -13:
+                point['y'] = 105
+                point['x'] = random.uniform(23, 80)
 
         # Update the y-coordinate for the animation
-        if game_paused == False:
-            y_position -= speed
-            if y_position < -25:
-                y_position = 105
+        position_of_y -= cars_speed
+        if position_of_y < -25:
+            position_of_y = 105
 
-        # OBSTACLES animation
-        obstacles.y -= speed
-        obstacles2.y -= speed
-        obstacles3.y -= speed
+        # Obstacles animation
+        obstacles.y -= cars_speed
+        obstacles2.y -= cars_speed
+        obstacles3.y -= cars_speed
 
-        if obstacles.y < 0 or dis == True:
-            # once_neg = True
-            # felled = True
-            # obstacles_speed += .01
-
+        if obstacles.y < 0 or dis:
             obstacles.x = random.randint(20, 70)
             obstacles.y = 105
             dis = False
-        if obstacles2.y < 0 or dis3 == True:
-            # once_neg = True
-            # felled = True
-            # obstacles_speed += .01
-
+        if obstacles2.y < 0 or dis3:
             obstacles2.x = random.randint(20, 70)
             obstacles2.y = 105
             dis3 = False
-
-        if obstacles3.y < 0 or dis4 == True:
-            # once_neg = True
-            # felled = True
-            # obstacles_speed += .01
-
+        if obstacles3.y < 0 or dis4:
             obstacles3.x = random.randint(20, 70)
             obstacles3.y = 105
             dis4 = False
 
-        # diamond_animation
-        diamond.y -= diamond_speed
+        # Diamond animation
+        diamond.y -= speed_of_diamond
         diamon_dis = -2000
-        if diamond.y < diamon_dis or dis2 == True:
-            # once_neg = True
-            # felled = True
-            # obstacles_speed += .01
-
+        if diamond.y < diamon_dis or dis2:
             diamond.x = random.randint(20, 70)
             diamond.y = 1000
             dis2 = False
 
-        get = collides_with_sq_obstacle(car_position, 4, 8, diamond)
+        # Diamond collision
+        get = square_obstacle_collision(position_of_car, 4, 8, diamond)
         if get:
-            lives += 1
-            diamon_dis = diamon_dis * 2
-            print("gotchaaaa!")
+            total_lives += 1
+            diamon_dis *= 2
+            print("Gotcha!")
             get = False
             dis2 = True
 
+        # Collision detection for obstacles
+        collision = square_obstacle_collision(position_of_car, 4, 8, obstacles)
+        collision2 = square_obstacle_collision(position_of_car, 4, 8, obstacles2)
+        collision3 = square_obstacle_collision(position_of_car, 4, 8, obstacles3)
 
-        collision = collides_with_sq_obstacle(car_position, 4, 8, obstacles)
-        collision2 = collides_with_sq_obstacle(car_position, 4, 8, obstacles2)
-        collision3 = collides_with_sq_obstacle(car_position, 4, 8, obstacles3)
-        if collision == True:
-            # print(var)
-            # var +=1
+        if collision:
             collision = False
             dis = True
-            lives -= 1
+            total_lives -= 1
             print("Ughhh!!")
-            if lives == 0:
+            if total_lives == 0:
                 print("Game Over")
-                winsound.PlaySound(None, 0)
-                # speed = 0
-                # circle_speed = 0
-                # point_speed = 0
-                # diamond_speed = 0
                 stop = False
-            else:
-                print(f"Lives remaining {lives}")
-
-        if collision2 == True:
-            # render_text(50, 50, f"It's your lucky day mate ('-')")
+        if collision2:
             collision2 = False
             dis3 = True
             print("It's your lucky day mate ('-')")
-
-        if collision3 == True:
-            # render_text(50, 50, f"It's your lucky day mate ('-')")
+        if collision3:
             collision3 = False
             dis4 = True
             print("It's your lucky day mate ('-')")
 
+        # Request screen update
         glutPostRedisplay()
 
 
-def key_action(key, x, y):
-    global car_position, game_paused, lives, stop
 
-    # Adjust the car position based on the arrow keys
-    if game_paused == False and lives != 0:
-        if key == GLUT_KEY_LEFT and car_position > 24:
-            car_position -= 1.5
-            # print('l', car_position)
-        elif key == GLUT_KEY_RIGHT and car_position < 78:
-            car_position += 1.5
-            # print('r', car_position)
+def key_action(key, x, y):
+    global position_of_car, game_is_paused, total_lives, stop, cars_speed, circles_speed, point_speed, score
+    global point_x, point_y, circle1_y, circle2_y, circle_x, diamond, trunk, obstacles, obstacles2, obstacles3
+
+    if key == GLUT_KEY_LEFT:  # Move car left
+        if position_of_car > 24:
+            position_of_car -= 1.5
+    elif key == GLUT_KEY_RIGHT:  # Move car right
+        if position_of_car < 78:
+            position_of_car += 1.5
+    # elif key == b'p':  # Pause the game
+    #     game_is_paused = not game_is_paused
+    #     print("Game Paused" if game_is_paused else "Game Resumed")
+    # elif key == b'r':  # Restart the game
+    #     # Restart Logic
+    #     stop = True
+    #     cars_speed = 0.38
+    #     circles_speed = 0.5
+    #     point_speed = 0.5
+    #     point_x = random.randint(10, 80)
+    #     point_y = 105
+
+    #     circle1_y = 105
+    #     circle2_y = 105
+    #     circle_x = random.randint(10, 80)
+
+    #     diamond.y = 1000
+    #     total_lives = 3
+    #     trunk = 96
+    #     score = 0
+    #     obstacles = AABB(random.randint(20, 70), 100 - 10, 10, 10)
+    #     obstacles2 = AABB(random.randint(20, 70), 100 - 10, 10, 10)
+    #     obstacles3 = AABB(random.randint(20, 70), 100 - 10, 10, 10)
+
+    #     print("Game Restarted!")
+    # elif key == b'e':  # Exit the game
+    #     print("Exiting Game! Final Score:", score)
+    #     glutLeaveMainLoop()
 
     glutPostRedisplay()
 
 
+
+
 def mouse_action(button, state, x, y):
-    global game_paused, speed, circle_speed, point_speed, p_speed, p_cir_speed, p_pts_speed, game_reset, score, diamond_speed
-    global point_x, point_y, y_position, circle1_y, circle2_y, circle_x, trunk, lives, obstacles, obstacles2, obstacles3, stop
+    global game_is_paused, stop, cars_speed, circles_speed, point_speed, score
+    global point_x, point_y, circle1_y, circle2_y, circle_x, diamond, trunk, obstacles, obstacles2, obstacles3
 
-    if button == GLUT_LEFT_BUTTON and state == GLUT_DOWN and lives != 0:  # pause the game
-        game_paused = not game_paused
-        if game_paused == True:
-            # if stop == True:
-            # p_speed = speed
-            # p_cir_speed = circle_speed
-            # p_pts_speed = point_speed
-            # speed = 0
-            # circle_speed = 0
-            # point_speed = 0
-            # diamond_speed = 0
-            stop = False
-        else:
+    # Transform mouse coordinates to match OpenGL's coordinate space
+    if button == GLUT_LEFT_BUTTON and state == GLUT_DOWN:
+        y = 100 - (y * 100) // WINDOW_HEIGHT  # Convert y-coordinate
+        x = (x * 100) // WINDOW_WIDTH  # Convert x-coordinate
+
+        # Exit button click (top-right corner)
+        if 88 <= x <= 92 and 95 <= y <= 99:
+            print("Exiting Game!")
+            glutLeaveMainLoop()
+
+        # Play/Pause button click (top-center)
+        elif 47 <= x <= 53 and 95 <= y <= 99:
+            game_is_paused = not game_is_paused
+            print("Game Paused!" if game_is_paused else "Game Resumed!")
+
+        # Restart button click (top-left corner)
+        elif 5 <= x <= 12 and 93 <= y <= 97:
             stop = True
-            # speed = p_speed
-            # circle_speed = p_cir_speed
-            # point_speed = p_pts_speed
-            # p_speed = 0
-            # p_cir_speed = 0
-            # p_pts_speed = 0
-            # diamond_speed = 0.45
+            cars_speed = 0.38
+            circles_speed = 0.5
+            point_speed = 0.5
+            point_x = random.randint(10, 80)
+            point_y = 105
 
-    if button == GLUT_RIGHT_BUTTON and state == GLUT_DOWN:  # restart the game
+            circle1_y = 105
+            circle2_y = 105
+            circle_x = random.randint(10, 80)
 
-        stop = True
-        speed = 0.38
-        circle_speed = 0.5
-        point_speed = 0.5
-        point_x = random.randint(10, 80)
-        point_y = 105
+            diamond.y = 1000
+            trunk = 96
+            score = 0
+            obstacles = AABB(random.randint(20, 70), 100 - 10, 10, 10)
+            obstacles2 = AABB(random.randint(20, 70), 100 - 10, 10, 10)
+            obstacles3 = AABB(random.randint(20, 70), 100 - 10, 10, 10)
+            print("Game Restarted!")
 
+    glutPostRedisplay()
 
-
-        circle1_y = 105
-        circle2_y = 105
-        circle_x = random.randint(10, 80)
-
-        diamond.y = 1000
-        lives = 3
-        trunk = 96
-        score = 0
-        obstacles = AABB(random.randint(20, 70), 100 - 10, 10, 10)
-        obstacles2 = AABB(random.randint(20, 70), 100 - 10, 10, 10)
-        obstacles3 = AABB(random.randint(20, 70), 100 - 10, 10, 10)
 
 
 obstacles = AABB(random.randint(20, 70), 100 - 10, 10, 10)
@@ -603,7 +636,9 @@ def main():
 
     init()
     glutDisplayFunc(display)
-    glutSpecialFunc(key_action)
+    glutKeyboardFunc(key_action)  # Register for normal keys
+    glutSpecialFunc(key_action)   # Register for special keys (arrow keys)
+
     glutMouseFunc(mouse_action)
     glutIdleFunc(animation)
     glutMainLoop()
