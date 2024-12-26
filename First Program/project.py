@@ -62,7 +62,7 @@ num_points = 5
 points = []
 score = 0
 
-# Storing points coordinates
+# Storing points coordinates that will fall down yellow coin 
 for i in range(num_points):
     point_x = random.uniform(23, 80)
     point_y = random.uniform(150, 110)
@@ -479,6 +479,7 @@ def animation():
             total_lives -= 1
             print("You lost 1 live")
             if total_lives == 0:
+                points.clear()
                 print("Game Over, YOUR score is", score)
                 stop = False  # Halt the game logic
         if collision2:
@@ -620,10 +621,10 @@ def init():
 
 
 def main():
-    glutInit()
+    glutInit() 
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB)
     glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT)
-    glutCreateWindow(b"DRIVE UNTIL DEATH")
+    glutCreateWindow(b"CAR COLLISION GAME")
 
     init()
     glutDisplayFunc(display)
