@@ -535,7 +535,7 @@ def animation():
             collision2 = False
             dis3 = True
             total_lives -= 1  # Reduce lives for collision with the second obstacle
-            print("You lost 1 life (second obstacle)")
+            print("You lost 1 life ")
             if total_lives == 0:
                 print("Game Over, YOUR score is", score)
                 stop = False  # Halt the game logic
@@ -545,7 +545,7 @@ def animation():
             collision3 = False
             dis4 = True
             total_lives -= 1  # Reduce lives for collision with the third obstacle
-            print("You lost 1 life (third obstacle)")
+            print("You lost 1 life")
             if total_lives == 0:
                 print("Game Over, YOUR score is", score)
                 stop = False  # Halt the game logic
