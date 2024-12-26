@@ -7,8 +7,8 @@ import random
 
 
 # window size
-WINDOW_WIDTH = 700
-WINDOW_HEIGHT = 700
+WINDOW_WIDTH = 800
+WINDOW_HEIGHT = 600
 
 # collision variables
 collision = False
@@ -20,7 +20,7 @@ collision3 = False
 point_x = random.randint(10, 80) # random x-coordinate of the point
 point_y = 150 #y-coordinate of the point
 
-position_of_y = 105
+position_of_y = 105 ##CAR POSITION 
 
 # tree
 circle1_y = 105 #y-coordinate of the tree
@@ -37,10 +37,10 @@ dis3 = False
 dis4 = False
 
 cars_speed = 0.38
-speed_of_diamond = 0.45
-speed_of_obstacle = 0.5
+speed_of_diamond = 0.55
+speed_of_obstacle = 0.1
 
-position_of_car = 51
+position_of_car = 51 ##X AXIS E KOTHAY ASE CAR 
 dir_of_car_movement = 0
 
 game_is_paused = False
@@ -53,16 +53,14 @@ p_cir_speed = 0
 
 total_lives = 3
 
-#var = 1
 
-#p_pts_speed = 0
-point_speed = 0.5
+point_speed = 0.35
 
 num_points = 5
 points = []
 score = 0
 
-# Storing points coordinates that will fall down yellow coin 
+# Storing points coordinates
 for i in range(num_points):
     point_x = random.uniform(23, 80)
     point_y = random.uniform(150, 110)
@@ -80,7 +78,7 @@ class AABB:
         self.x=x
         self.y=y
         self.w=w
-        self.h = h
+        self.h=h
 
     def collides_with(self, other):
         return (self.x < other.x + other.w and
@@ -91,21 +89,45 @@ class AABB:
 
 # obstacle collision condition
 ##horizontal and vertical collision detect holei collision =True using AABB 
+# def square_obstacle_collision(car_pos, car_width, car_height, obstacles):
+#     return (car_pos -5 < obstacles.x + obstacles.w and #if the left edge ofthe car is to the left of the right of the obs
+#             car_pos + car_width > obstacles.x and #if the right edge of the car is to the left of the obs
+#             #top edge of the car=20
+#             20 < obstacles.y + obstacles.h and
+#             20 + car_height > obstacles.y)
+
+
 
 def square_obstacle_collision(car_pos, car_width, car_height, obstacles):
-    return (car_pos -5 < obstacles.x + obstacles.w and #if the left edge ofthe car is to the left of the right of the obs
-            car_pos + car_width > obstacles.x and #if the right edge of the car is to the left of the obs
-            #top edge of the car=20
-            20 < obstacles.y + obstacles.h and
-            20 + car_height > obstacles.y)
+    # Adjust the collision bounds to align with visual representations
+    car_left = car_pos - car_width / 2
+    car_right = car_pos + car_width / 2
+    car_top = 20 + car_height  # Top edge of the car
+    car_bottom = 20           # Bottom edge of the car
+
+    obstacle_left = obstacles.x
+    obstacle_right = obstacles.x + obstacles.w
+    obstacle_top = obstacles.y + obstacles.h
+    obstacle_bottom = obstacles.y
+
+    # Check if any overlap occurs
+    return (car_right > obstacle_left and  # Car's right edge past obstacle's left edge
+            car_left < obstacle_right and  # Car's left edge before obstacle's right edge
+            car_top > obstacle_bottom and  # Car's top edge past obstacle's bottom edge
+            car_bottom < obstacle_top)     # Car's bottom edge before obstacle's top edge
+
+
 
 ##Check collision with points and car  
 
-def collision_with_car(car_pos, car_width, car_height, point):  
-    car_aabb = AABB(car_pos - car_width / 2, 20 - car_height / 2, car_width, car_height)
-    point_aabb = AABB(point['x'], point['y'], 1, 1)
+def collision_with_car(car_pos, car_width, car_height, point):
+    padding = 1.5  # Tolerance for small points
+    car_aabb = AABB(car_pos - car_width / 2 - padding, 20 - car_height / 2 - padding,
+                    car_width + 2 * padding, car_height + 2 * padding)
+    point_aabb = AABB(point['x'] - padding, point['y'] - padding, 2 * padding, 2 * padding)
 
     return car_aabb.collides_with(point_aabb)
+
 
 
 
@@ -266,6 +288,7 @@ def text_rendering(x, y, text, r, g, b):
 
 
 def display():
+    
     global score, game_is_paused
     global position_of_y, score, cars_speed, circle1_y, circle2_y, point_speed, circles_speed, diamond, circle_x, seq, position_of_car, game_is_paused, speed_of_obstacle, collision, var, dis, total_lives, point_y, point_x, trunk, points
     glClear(GL_COLOR_BUFFER_BIT)
@@ -356,6 +379,7 @@ def display():
         text_rendering(43, 50, "Game Over. Press R to Restart.", 0.0, 1.0, 1.0)
         glColor3f(1.0, 1.0, 1.0)
         text_rendering(43, 45, f"Your Final Score: {score}!", 1.0, 1.0, 1.0)
+       
     # Draw Buttons
     draw_restart_icon()  # Restart icon at top-left
     draw_pause_icon(game_is_paused)  # Pause/Resume icon at top-center
@@ -367,11 +391,8 @@ def display():
     
     
 def draw_restart_icon():
-    glColor3f(0.0, 1.0, 1.0)  # Cyan for Restart icon
-    # Smaller arrow for Restart
-    draw_line(5, 95, 12, 95)  # Horizontal line (arrow base)
-    draw_line(5, 95, 9, 97)   # Upward diagonal (left side)
-    draw_line(5, 95, 9, 93)   # Downward diagonal (right side)
+    text_rendering(1,97, "Press R to Restart", 0.0, 0.0, 0.0)
+
 
 def draw_pause_icon(paused):
     glColor3f(0.7, 0.7, 0.0)  # Yellow for Pause/Resume
@@ -472,24 +493,62 @@ def animation():
         collision2 = square_obstacle_collision(position_of_car, 4, 8, obstacles2)
         collision3 = square_obstacle_collision(position_of_car, 4, 8, obstacles3)
         
+        # collision = square_obstacle_collision(position_of_car, 4, 8, obstacles)
+        # collision2 = square_obstacle_collision(position_of_car, 4, 8, obstacles2)
+        # collision3 = square_obstacle_collision(position_of_car, 4, 8, obstacles3)
         
+        
+        # if collision:
+        #     collision = False
+        #     dis = True
+        #     total_lives -= 1
+        #     print("You lost 1 live")
+        #     if total_lives == 0:
+        #         points.clear()
+        #         print("Game Over, YOUR score is", score)
+        #         stop = False  # Halt the game logic
+        # if collision2:
+        #     collision2 = False
+        #     dis3 = True
+        #     print("You are lucky this time  ('-')")
+        # if collision3:
+        #     collision3 = False
+        #     dis4 = True
+        #     print("You are lucky this time ('-')")
+
+    # Request screen update if animations are proceeding
+        # glutPostRedisplay()
+        
+        
+        # Handle collision with the first obstacle
         if collision:
             collision = False
             dis = True
             total_lives -= 1
-            print("You lost 1 live")
+            print("You lost 1 life")
             if total_lives == 0:
-                points.clear()
                 print("Game Over, YOUR score is", score)
                 stop = False  # Halt the game logic
+
+        # Handle collision with the second obstacle
         if collision2:
             collision2 = False
             dis3 = True
-            print("You are lucky this time  ('-')")
+            total_lives -= 1  # Reduce lives for collision with the second obstacle
+            print("You lost 1 life (second obstacle)")
+            if total_lives == 0:
+                print("Game Over, YOUR score is", score)
+                stop = False  # Halt the game logic
+
+        # Handle collision with the third obstacle
         if collision3:
             collision3 = False
             dis4 = True
-            print("You are lucky this time ('-')")
+            total_lives -= 1  # Reduce lives for collision with the third obstacle
+            print("You lost 1 life (third obstacle)")
+            if total_lives == 0:
+                print("Game Over, YOUR score is", score)
+                stop = False  # Halt the game logic
 
     # Request screen update if animations are proceeding
     glutPostRedisplay()
@@ -572,27 +631,8 @@ def mouse_action(button, state, x, y):
 
         
         
-        # Restart button click (top-left corner)
-        elif 5 <= x <= 12 and 93 <= y <= 97:
-            # Reset all game variables properly
-            
-            stop = True
-            game_is_paused = False  # Ensure the game is unpaused
-            cars_speed = 0.38
-            circles_speed = 0.5
-            point_speed = 0.5
-            point_x = random.randint(10, 80)
-            point_y = 105
 
-            circle1_y = 105
-            circle2_y = 105
-            circle_x = random.randint(10, 80)
-
-            diamond.y = 1000
-            total_lives = 3  # Reset lives to 3
-            score = 0  # Reset score to 0
-            trunk = 96
-            
+    
 
             # Reset obstacles
             obstacles = AABB(random.randint(20, 70), 100 - 10, 10, 10)
@@ -621,10 +661,10 @@ def init():
 
 
 def main():
-    glutInit() 
+    glutInit()
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB)
     glutInitWindowSize(WINDOW_WIDTH, WINDOW_HEIGHT)
-    glutCreateWindow(b"CAR COLLISION GAME")
+    glutCreateWindow(b"cAR COLLISION GAME")
 
     init()
     glutDisplayFunc(display)
